@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>미납업체 관리</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: '맑은 고딕', Arial, sans-serif; background: #f0f2f5; color: #222; font-size: 14px; }
+  .top-bar { background: #1a3a6b; color: white; padding: 18px 30px; overflow: hidden; }
+  .top-bar h1 { font-size: 20px; font-weight: bold; display: inline-block; }
+  .top-bar .badge { float: right; background: #e74c3c; color: white; border-radius: 20px; padding: 4px 14px; font-size: 13px; font-weight: bold; margin-top: 2px; }
+  .warn-banner { background: #fff3cd; border-left: 5px solid #e67e22; padding: 12px 30px; font-size: 13px; color: #7d4e00; font-weight: bold; }
+  .toolbar { padding: 16px 30px; background: white; border-bottom: 1px solid #dde3ec; }
+  .toolbar input[type=text] { border: 1px solid #ccd3e0; border-radius: 4px; padding: 8px 14px; font-size: 14px; width: 250px; font-family: '맑은 고딕', Arial, sans-serif; margin-right: 6px; }
+  .toolbar select { border: 1px solid #ccd3e0; border-radius: 4px; padding: 8px 10px; font-size: 14px; font-family: '맑은 고딕', Arial, sans-serif; background: white; margin-right: 6px; }
+  .btn-search { background: #1a3a6b; color: white; border: none; border-radius: 4px; padding: 9px 22px; font-size: 14px; font-family: '맑은 고딕', Arial, sans-serif; font-weight: bold; cursor: pointer; margin-right: 4px; }
+  .btn-reset { background: white; color: #555; border: 1px solid #ccd3e0; border-radius: 4px; padding: 8px 14px; font-size: 14px; font-family: '맑은 고딕', Arial, sans-serif; cursor: pointer; }
+  .count-info { margin-top: 10px; font-size: 13px; color: #666; }
+  .count-info span { font-weight: bold; color: #1a3a6b; }
+  .table-wrap { padding: 20px 30px; }
+  table { width: 100%; border-collapse: collapse; background: white; box-shadow: 0 1px 6px rgba(0,0,0,0.08); }
+  thead tr { background: #1a3a6b; color: white; }
+  thead th { padding: 12px 14px; text-align: center; font-weight: bold; font-size: 13px; white-space: nowrap; border: 1px solid #15306b; }
+  tbody tr { border-bottom: 1px solid #edf0f5; }
+  tbody tr:hover { background: #f0f4ff; }
+  tbody td { padding: 11px 14px; vertical-align: middle; border: 1px solid #edf0f5; }
+  .td-no { text-align: center; color: #999; font-size: 12px; width: 40px; }
+  .td-site { text-align: center; width: 80px; }
+  .td-name { font-weight: bold; color: #1a1a2e; }
+  .td-red { text-align: right; font-weight: bold; color: #c0392b; white-space: nowrap; }
+  .td-green { text-align: right; font-weight: bold; color: #27ae60; white-space: nowrap; }
+  .td-gray { text-align: right; color: #999; }
+  .td-note { color: #666; font-size: 12px; }
+  .b1 { background: #dbeafe; color: #1e40af; display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+  .b2 { background: #d1fae5; color: #065f46; display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+  .b3 { background: #f3e8ff; color: #6b21a8; display: inline-block; padding: 2px 10px; border-radius: 10px; font-size: 12px; font-weight: bold; }
+  .tag-stop { background: #fee2e2; color: #991b1b; display: inline-block; padding: 2px 8px; border-radius: 4px; font-size: 11px; font-weight: bold; margin-left: 6px; border: 1px solid #fca5a5; }
+  .no-result { text-align: center; padding: 40px; color: #aaa; font-size: 15px; display: none; }
+  .footer { text-align: center; padding: 20px; color: #aaa; font-size: 12px; }
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <span class="badge">주문 접수 금지</span>
+  <h1>🚫 미납업체 관리</h1>
+</div>
+<div class="warn-banner">⚠️ 아래 업체는 미납으로 인해 주문 접수가 불가합니다. 반드시 확인 후 처리하십시오.</div>
+<div class="toolbar">
+  <input type="text" id="searchInput" placeholder="업체명을 입력하세요">
+  <select id="siteFilter">
+    <option value="">전체 사업소</option>
+    <option value="전북1">전북1</option>
+    <option value="전남">전남</option>
+    <option value="기타">기타</option>
+  </select>
+  <button class="btn-search" onclick="filterTable()">검색</button>
+  <button class="btn-reset" onclick="resetFilter()">초기화</button>
+  <div class="count-info">총 <span id="showCount">41</span>개 업체 표시중</div>
+</div>
+<div class="table-wrap">
+  <table id="mainTable">
+    <thead><tr><th>번호</th><th>사업소</th><th>거래처명</th><th>잔액 (원)</th><th>비고</th></tr></thead>
+    <tbody id="tableBody"></tbody>
+  </table>
+  <div class="no-result" id="noResult">검색 결과가 없습니다.</div>
+</div>
+<div class="footer">최종 업데이트: 2026년 3월 &nbsp;|&nbsp; 미납업체 관리 시스템</div>
+<script type="text/javascript">
+var data = [
+  {no:'4',site:'전북1',name:'광명수산-김진규',amt:3502003,note:''},
+  {no:'8',site:'전북1',name:'레드팜',amt:2649295,note:''},
+  {no:'11',site:'전북1',name:'오혜경',amt:1760000,note:''},
+  {no:'12',site:'전북1',name:'삼방농원',amt:1628000,note:''},
+  {no:'13',site:'전북1',name:'윤옥란',amt:1321980,note:''},
+  {no:'15',site:'전북1',name:'홍효원',amt:924000,note:''},
+  {no:'18',site:'전북1',name:'삼광석재-노찬호',amt:662694,note:''},
+  {no:'36',site:'전북1',name:'낭산수산-채종숙',amt:9999,note:''},
+  {no:'39',site:'전남',name:'유칠상',amt:12166176,note:''},
+  {no:'40',site:'전남',name:'(주)에이지씨',amt:7871784,note:''},
+  {no:'41',site:'전남',name:'로가닉코리아',amt:0,note:'3월 입금 완료'},
+  {no:'42',site:'전남',name:'신호수산',amt:6719526,note:''},
+  {no:'43',site:'전남',name:'문영훈',amt:6577120,note:''},
+  {no:'44',site:'전남',name:'옥명환',amt:5915712,note:''},
+  {no:'45',site:'전남',name:'아우름영농조합법인',amt:5328180,note:''},
+  {no:'46',site:'전남',name:'동감수산',amt:4799080,note:''},
+  {no:'',site:'전남',name:'참푸른영농조합',amt:-1,note:'배차중단',stop:true},
+  {no:'49',site:'전남',name:'참푸른영농조합법인-임동휘',amt:2871330,note:'배차중단',stop:true},
+  {no:'50',site:'전남',name:'정재식',amt:2732697,note:''},
+  {no:'53',site:'전남',name:'윤재윤',amt:1999998,note:''},
+  {no:'54',site:'전남',name:'광주/하관식',amt:1844150,note:''},
+  {no:'56',site:'전남',name:'고재칠',amt:1320000,note:''},
+  {no:'57',site:'전남',name:'하오봉',amt:831430,note:''},
+  {no:'',site:'기타',name:'농업회사법인 선웰빙',amt:-1,note:''},
+  {no:'',site:'기타',name:'대한산업가스텍',amt:-1,note:''},
+  {no:'',site:'기타',name:'임정권(임윤호)',amt:-1,note:''},
+  {no:'',site:'기타',name:'권현자(권의진)',amt:-1,note:''},
+  {no:'',site:'기타',name:'또마토(김영기)',amt:-1,note:''},
+  {no:'',site:'기타',name:'팜스타',amt:-1,note:''},
+  {no:'',site:'기타',name:'덕유산프러그육묘장(2)',amt:-1,note:''},
+  {no:'',site:'기타',name:'라스서정양어장',amt:-1,note:''},
+  {no:'',site:'기타',name:'태원철강-정주원',amt:-1,note:''},
+  {no:'',site:'기타',name:'흥양영농조합법인 해스민',amt:-1,note:''},
+  {no:'',site:'기타',name:'농업회사법인조은팜(주)',amt:-1,note:''},
+  {no:'',site:'기타',name:'큰골주식회사',amt:-1,note:''},
+  {no:'',site:'기타',name:'광주/위찬욱',amt:-1,note:''},
+  {no:'',site:'기타',name:'열호수산',amt:-1,note:''},
+  {no:'',site:'기타',name:'달콤농장(주)',amt:-1,note:''},
+  {no:'',site:'기타',name:'현빈수산',amt:-1,note:''},
+  {no:'',site:'기타',name:'해동가스(동화산업가스)',amt:-1,note:'배차중단',stop:true},
+  {no:'',site:'기타',name:'에이원테크(주)',amt:-1,note:'배차중단',stop:true}
+];
+
+function fmtAmt(n) {
+  var s = String(n), r = '', c = 0;
+  for (var i = s.length - 1; i >= 0; i--) {
+    if (c > 0 && c % 3 === 0) r = ',' + r;
+    r = s[i] + r; c++;
+  }
+  return r + ' 원';
+}
+
+function getBadge(site) {
+  if (site === '전북1') return '<span class="b1">전북1</span>';
+  if (site === '전남')  return '<span class="b2">전남</span>';
+  return '<span class="b3">기타</span>';
+}
+
+function renderTable(list) {
+  var html = '', d, amtHtml;
+  for (var i = 0; i < list.length; i++) {
+    d = list[i];
+    if (d.amt === -1)     amtHtml = '<td class="td-gray">-</td>';
+    else if (d.amt === 0) amtHtml = '<td class="td-green">입금완료</td>';
+    else                  amtHtml = '<td class="td-red">' + fmtAmt(d.amt) + '</td>';
+    var stopTag = d.stop ? '<span class="tag-stop">배차중단</span>' : '';
+    html += '<tr><td class="td-no">' + d.no + '</td><td class="td-site">' + getBadge(d.site) + '</td><td class="td-name">' + d.name + stopTag + '</td>' + amtHtml + '<td class="td-note">' + d.note + '</td></tr>';
+  }
+  document.getElementById('tableBody').innerHTML = html;
+  document.getElementById('showCount').innerHTML = '' + list.length;
+  document.getElementById('noResult').style.display = list.length === 0 ? 'block' : 'none';
+  document.getElementById('mainTable').style.display = list.length === 0 ? 'none' : 'table';
+}
+
+function filterTable() {
+  var kw = document.getElementById('searchInput').value.replace(/^\s+|\s+$/g, '');
+  var site = document.getElementById('siteFilter').value;
+  var out = [];
+  for (var i = 0; i < data.length; i++) {
+    if (data[i].name.indexOf(kw) !== -1 && (site === '' || data[i].site === site)) {
+      out.push(data[i]);
+    }
+  }
+  renderTable(out);
+}
+
+function resetFilter() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('siteFilter').value = '';
+  renderTable(data);
+}
+
+document.getElementById('searchInput').onkeydown = function(e) {
+  if ((e || window.event).keyCode === 13) filterTable();
+};
+
+renderTable(data);
+</script>
+</body>
+</html>
