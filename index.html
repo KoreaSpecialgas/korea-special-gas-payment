@@ -43,9 +43,9 @@
 <body>
 <div class="top-bar">
   <span class="badge">주문 접수 금지</span>
-  <h1>🚫 미납업체 관리</h1>
+  <h1>미납업체 관리</h1>
 </div>
-<div class="warn-banner">⚠️ 아래 업체는 미납으로 인해 주문 접수가 불가합니다. 반드시 확인 후 처리하십시오.</div>
+<div class="warn-banner">아래 업체는 미납으로 인해 주문 접수가 불가합니다. 반드시 확인 후 처리하십시오.</div>
 <div class="toolbar">
   <input type="text" id="searchInput" placeholder="업체명을 입력하세요">
   <select id="siteFilter">
@@ -56,7 +56,7 @@
   </select>
   <button class="btn-search" onclick="filterTable()">검색</button>
   <button class="btn-reset" onclick="resetFilter()">초기화</button>
-  <div class="count-info">총 <span id="showCount">41</span>개 업체 표시중</div>
+  <div class="count-info">총 <span id="showCount">0</span>개 업체 표시중</div>
 </div>
 <div class="table-wrap">
   <table id="mainTable">
@@ -68,47 +68,31 @@
 <div class="footer">최종 업데이트: 2026년 3월 &nbsp;|&nbsp; 미납업체 관리 시스템</div>
 <script type="text/javascript">
 var data = [
-  {no:'4',site:'전북1',name:'광명수산-김진규',amt:3502003,note:''},
-  {no:'8',site:'전북1',name:'레드팜',amt:2649295,note:''},
-  {no:'9',site:'전북1',name:'허덕문(희망농원)',amt:0,note:'3월 입금 완료'},
-  {no:'11',site:'전북1',name:'오혜경',amt:1760000,note:''},
-  {no:'12',site:'전북1',name:'삼방농원',amt:1628000,note:''},
-  {no:'13',site:'전북1',name:'윤옥란',amt:1321980,note:''},
-  {no:'15',site:'전북1',name:'홍효원',amt:924000,note:''},
-  {no:'18',site:'전북1',name:'삼광석재-노찬호',amt:662694,note:''},
-  {no:'36',site:'전북1',name:'낭산수산-채종숙',amt:9999,note:''},
-  {no:'39',site:'전남',name:'유칠상',amt:12166176,note:''},
-  {no:'40',site:'전남',name:'(주)에이지씨',amt:7871784,note:''},
-  {no:'41',site:'전남',name:'로가닉코리아',amt:0,note:'3월 입금 완료'},
-  {no:'42',site:'전남',name:'신호수산',amt:6719526,note:''},
-  {no:'43',site:'전남',name:'문영훈',amt:6577120,note:''},
-  {no:'44',site:'전남',name:'옥명환',amt:5915712,note:''},
-  {no:'45',site:'전남',name:'아우름영농조합법인',amt:5328180,note:''},
-  {no:'46',site:'전남',name:'동감수산',amt:4799080,note:''},
-  {no:'49',site:'전남',name:'참푸른영농조합법인-임동휘',amt:2871330,note:'배차중단',stop:true},
-  {no:'50',site:'전남',name:'정재식',amt:2732697,note:''},
-  {no:'53',site:'전남',name:'윤재윤',amt:1999998,note:''},
-  {no:'54',site:'전남',name:'광주/하관식',amt:1844150,note:''},
-  {no:'56',site:'전남',name:'고재칠',amt:1320000,note:''},
-  {no:'57',site:'전남',name:'하오봉',amt:831430,note:''},
-  {no:'',site:'기타',name:'농업회사법인 선웰빙',amt:-1,note:''},
-  {no:'',site:'기타',name:'대한산업가스텍',amt:-1,note:''},
-  {no:'',site:'기타',name:'임정권(임윤호)',amt:-1,note:''},
-  {no:'',site:'기타',name:'권현자(권의진)',amt:-1,note:''},
-  {no:'',site:'기타',name:'또마토(김영기)',amt:-1,note:''},
-  {no:'',site:'기타',name:'팜스타',amt:-1,note:''},
-  {no:'',site:'기타',name:'덕유산프러그육묘장(2)',amt:-1,note:''},
-  {no:'',site:'기타',name:'라스서정양어장',amt:-1,note:''},
-  {no:'',site:'기타',name:'태원철강-정주원',amt:-1,note:''},
-  {no:'',site:'기타',name:'흥양영농조합법인 해스민',amt:-1,note:''},
-  {no:'',site:'기타',name:'농업회사법인조은팜(주)',amt:-1,note:''},
-  {no:'',site:'기타',name:'큰골주식회사',amt:-1,note:''},
-  {no:'',site:'기타',name:'광주/위찬욱',amt:-1,note:''},
-  {no:'',site:'기타',name:'열호수산',amt:-1,note:''},
-  {no:'',site:'기타',name:'달콤농장(주)',amt:-1,note:''},
-  {no:'',site:'기타',name:'현빈수산',amt:-1,note:''},
-  {no:'',site:'기타',name:'해동가스(동화산업가스)',amt:-1,note:'배차중단',stop:true},
-  {no:'',site:'기타',name:'에이원테크(주)',amt:-1,note:'배차중단',stop:true}
+  {no:'4',  site:'전북1', name:'광명수산-김진규',           amt:3502003,  stop:false, note:''},
+  {no:'8',  site:'전북1', name:'레드팜',                    amt:2649295,  stop:false, note:''},
+  {no:'11', site:'전북1', name:'오혜경',                    amt:1760000,  stop:false, note:''},
+  {no:'12', site:'전북1', name:'삼방농원',                  amt:1628000,  stop:false, note:''},
+  {no:'13', site:'전북1', name:'윤옥란',                    amt:1321980,  stop:false, note:''},
+  {no:'15', site:'전북1', name:'홍효원',                    amt:924000,   stop:false, note:''},
+  {no:'18', site:'전북1', name:'삼광석재-노찬호',           amt:662694,   stop:false, note:'벌크+실린더'},
+  {no:'36', site:'전북1', name:'낭산수산-채종숙',           amt:9999,     stop:false, note:''},
+  {no:'39', site:'전남',  name:'유칠상',                    amt:12166176, stop:false, note:''},
+  {no:'40', site:'전남',  name:'(주)에이지씨',              amt:7871784,  stop:false, note:''},
+  {no:'41', site:'전남',  name:'로가닉코리아',              amt:0,        stop:false, note:'3월 입금완료'},
+  {no:'42', site:'전남',  name:'신호수산',                  amt:6719526,  stop:false, note:''},
+  {no:'43', site:'전남',  name:'문영훈',                    amt:6577120,  stop:false, note:''},
+  {no:'44', site:'전남',  name:'옥명환',                    amt:5915712,  stop:false, note:''},
+  {no:'45', site:'전남',  name:'아우름영농조합법인',        amt:5328180,  stop:false, note:''},
+  {no:'46', site:'전남',  name:'동감수산',                  amt:4799080,  stop:false, note:''},
+  {no:'',   site:'전남',  name:'참푸른영농조합',            amt:-1,       stop:true,  note:'배차중단'},
+  {no:'49', site:'전남',  name:'임동휘 참푸른영농조합법인', amt:2871330,  stop:false, note:''},
+  {no:'50', site:'전남',  name:'정재식',                    amt:2732697,  stop:false, note:''},
+  {no:'53', site:'전남',  name:'윤재윤',                    amt:1999998,  stop:false, note:''},
+  {no:'54', site:'전남',  name:'하관식',                    amt:1844150,  stop:false, note:''},
+  {no:'56', site:'전남',  name:'고재칠',                    amt:1320000,  stop:false, note:''},
+  {no:'',   site:'기타',  name:'해동가스(동화산업가스)',    amt:-1,       stop:true,  note:'배차중단'},
+  {no:'',   site:'기타',  name:'에이원테크(주)',             amt:-1,       stop:true,  note:'배차중단'},
+  {no:'57', site:'전남',  name:'하오봉',                    amt:831430,   stop:false, note:''}
 ];
 
 function fmtAmt(n) {
@@ -127,13 +111,13 @@ function getBadge(site) {
 }
 
 function renderTable(list) {
-  var html = '', d, amtHtml;
+  var html = '', d, amtHtml, stopTag;
   for (var i = 0; i < list.length; i++) {
     d = list[i];
     if (d.amt === -1)     amtHtml = '<td class="td-gray">-</td>';
     else if (d.amt === 0) amtHtml = '<td class="td-green">입금완료</td>';
     else                  amtHtml = '<td class="td-red">' + fmtAmt(d.amt) + '</td>';
-    var stopTag = d.stop ? '<span class="tag-stop">배차중단</span>' : '';
+    stopTag = d.stop ? '<span class="tag-stop">배차중단</span>' : '';
     html += '<tr><td class="td-no">' + d.no + '</td><td class="td-site">' + getBadge(d.site) + '</td><td class="td-name">' + d.name + stopTag + '</td>' + amtHtml + '<td class="td-note">' + d.note + '</td></tr>';
   }
   document.getElementById('tableBody').innerHTML = html;
@@ -147,9 +131,7 @@ function filterTable() {
   var site = document.getElementById('siteFilter').value;
   var out = [];
   for (var i = 0; i < data.length; i++) {
-    if (data[i].name.indexOf(kw) !== -1 && (site === '' || data[i].site === site)) {
-      out.push(data[i]);
-    }
+    if (data[i].name.indexOf(kw) !== -1 && (site === '' || data[i].site === site)) out.push(data[i]);
   }
   renderTable(out);
 }
